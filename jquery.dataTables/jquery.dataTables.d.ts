@@ -1,479 +1,449 @@
-// Type definitions for JQuery DataTables 1.9.4
+// Type definitions for JQuery DataTables 1.10.4
 // Project: http://www.datatables.net
-// Definitions by: Armin Sander <https://github.com/pragmatrix/>
-// Definitions: https://github.com/borisyankov/DefinitelyTyped
+//
+// jquery.DataTables 1.10 had some pretty significant API changes and pretty much everything was renamed
+// This definition file requires Typescript 1.3 for the use of Tuple Types, and further completion can be done
+// when Typescript 1.4 releases to use Unions for more specific typing
+//
 
-// missing:
-// - Static methods that are defined in JQueryStatic.fn are not typed.
-// - Plugin and extension definitions are not typed.
-
-interface JQuery
-{
-	dataTable(param? :DataTables.Options) : DataTables.DataTable;
+interface JQuery {
+	dataTable: DataTables.StaticApi;
+	DataTable( options?: DataTables.Options ): DataTables.Api;
 }
 
-declare module DataTables
-{
-	export interface DataTable
-	{
-		/// Perform a jQuery selector action on the table's TR elements (from the tbody) and return the resulting jQuery object.
-		$(selector:string, opts?:RowParams): JQuery;
-		$(selector:Node[], opts?:RowParams): JQuery;
-		$(selector:JQuery, opts?:RowParams): JQuery;
+declare module DataTables {
+	//#region Types
+	export interface Options {
+		//#region Features
+		autoWidth?: boolean;
+		deferRender?: boolean;
+		info?: boolean;
+		jQueryUI?: boolean;
+		lengthChange?: boolean;
+		ordering?: boolean;
+		paging?: boolean;
+		processing?: boolean;
+		scrollX?: boolean;
+		scrollY?: string;
+		searching?: boolean;
+		serverSide?: boolean;
+		stateSave?: boolean;
+		//#endregion
 
-		/// Almost identical to $ in operation, but in this case returns the data for the matched rows.
-		_(selector:string, opts?:RowParams): any[];
-		_(selector:Node[], opts?:RowParams): any[];
-		_(selector:JQuery, opts?:RowParams): any[];
-
-		/// Add a single new row or multiple rows of data to the table.
-		fnAddData(data:any, redraw?:boolean) : number[];
-
-		/// This function will make DataTables recalculate the column sizes.
-		fnAdjustColumnSizing(redraw? : boolean) : void;
-
-		/// Quickly and simply clear a table
-		fnClearTable(redraw? : boolean) : void;
-
-		/// The exact opposite of 'opening' a row, this function will close any rows which are currently 'open'.
-		fnClose(node: Node) : number;
-
-		///	Remove a row for the table
-		fnDeleteRow(index: number, callback?: () => void, redraw?: boolean) : any[];
-		fnDeleteRow(tr: Node, callback?: () => void, redraw?: boolean) : any[];
-
-		/// Restore the table to it's original state in the DOM by removing all of DataTables enhancements,
-		/// alterations to the DOM structure of the table and event listeners.
-		fnDestroy(remove?: boolean) : void;
-
-		/// Redraw the table
-		fnDraw(complete? : boolean) : void;
-
-		/// Filter the input based on data
-		fnFilter(input: string, column? : number, regex?: boolean, smart? : boolean, showGlobal?: boolean, caseInsensitive? : boolean) : void;
-
-		/// Get the data for the whole table, an individual row or an individual cell based on the provided parameters.
-		fnGetData(row?: Node, col? : number) : any;
-		fnGetData(row?: number, col? : number) : any;
-
-		/// Get an array of the TR nodes that are used in the table's body.
-		fnGetNodes(row? : number) : any; // Node[] | Node
-
-		/// Get the array indexes of a particular cell from it's DOM element and column index including hidden columns
-		fnGetPosition(node: Node) : any; // number | number[]
-
-		/// Check to see if a row is 'open' or not.
-		fnIsOpen(tr: Node) : boolean;
-
-		/// This function will place a new row directly after a row which is currently on display on the page,
-		/// with the HTML contents that is passed into the function.
-		fnOpen(node: Node, html: string, clazz: string) : Node;
-		fnOpen(node: Node, html: Node, clazz: string) : Node;
-		fnOpen(node: Node, html: JQuery, clazz: string) : Node;
-
-		/// Change the pagination - provides the internal logic for pagination in a simple API function.
-		fnPageChange(action: string, redraw?: boolean) : void;
-		fnPageChange(page: number, redraw?: boolean) : void;
-
-		/// Show a particular column
-		fnSetColumnVis(column: number, show: boolean, redraw?: boolean) : void;
-
-		/// Get the settings for a particular table for external manipulation
-		fnSettings() : Settings;
-
-		/// Sort the table by a particular column
-		fnSort(col: number) : void;
-		fnSort(col: any[][]) : void;
-
-		/// Attach a sort listener to an element for a given column
-		fnSortListener(node: Node, column: number, callback? : () => void): void;
-
-		/// Update a table cell or row - this method will accept either a single value to update the cell with,
-		/// an array of values with one element for each column or an object in the same format as the original data source.
-		fnUpdate(data: any, row: Node, column?:number, redraw?: boolean, action? : boolean) : number;
-		fnUpdate(data: any, dataIndex: number, column?:number, redraw?: boolean, action? : boolean) : number;
-
-		/// Provide a common method for plug-ins to check the version of DataTables being used,
-		/// in order to ensure compatibility.
-		fnVersionCheck(version: string) : boolean;
-	}
-
-	export interface Static
-	{
-		/// Provide a common method for plug-ins to check the version of DataTables being used,
-		/// in order to ensure compatibility.
-		fnVersionCheck(version: string) : boolean;
-
-		/// Check if a TABLE node is a DataTable table already or not.
-		fnIsDataTable(table: Node) : boolean;
-
-		/// Get all DataTable tables that have been initialised.
-		fnTables(visible? : boolean) : Node[];
-	}
-
-	export interface RowParams
-	{
-		/// Select TR elements that meet the current filter criterion ("applied") or all TR elements (i.e. no filter).
-		filter?: string;
-
-		/// Order of the TR elements in the processed array.
-		/// Can be either 'current', whereby the current sorting of the table is used, or
-		/// 'original' whereby the original order the data was read into the table is used.
-		order?: string;
-
-		/// Limit the selection to the currently displayed page
-		/// ("current") or not ("all"). If 'current' is given, then order is assumed to be
-		/// 'current' and filter is 'applied', regardless of what they might be given as.
-		page?: string;
-	}
-
-	export interface Options
-	{
-		aaData?: any[];
-		aaSorting?: any[];
-		aaSortingFixed?: any[];
+		//#region Data
 		ajax?: any;
-		aLengthMenu?: any[];
-		aoColumns?: ColumnOptions[];
-		aoColumnDefs?: ColumnDef[];
-		aoSearchCols?: any[];
-		asStripClasses?: string[];
-		bAutoWidth?: boolean;
-		bDeferRender?: boolean;
-		bDestroy?: boolean;
-		bFilter?: boolean;
-		bInfo?: boolean;
-		bJQueryUI?: boolean;
-		bLengthChange?: boolean;
-		bPaginate?: boolean;
-		bProcessing?: boolean;
-		bRetrieve?: boolean;
-		bScrollAutoCss?: boolean;
-		bScrollCollapse?: boolean;
-		bScrollInfinite?: boolean;
-		bServerSide?: boolean;
-		bSort?: boolean;
-		bSortCellsTop?: boolean;
-		bSortClasses?: boolean;
-		bStateSave?: boolean;
-		fnCookieCallback?: CookieCallback;
-		fnCreatedRow?: RowCreatedCallback;
-		fnDrawCallback?: DrawCallback;
-		fnFooterCallback?: FooterCallback;
-		fnFormatNumber?: FormatNumber;
-		fnHeaderCallback?: HeaderCallback;
-		fnInfoCallback?: InfoCallback;
-		fnInitComplete?: InitComplete;
-		fnPreDrawCallback?: PreDrawCallback;
-		fnRowCallback?: RowCallback;
+		data?: any[];
+		//#endregion
 
-		fnStateLoadCallback?: StateLoadCallback;
-		fnStateLoadParams?: StateLoadParams;
-		fnStateLoaded?: StateLoaded;
-		fnStateSaveCallback?: StateSaveCallback;
-		fnStateSaveParams?: StateSaveParams;
-		iCookieDuration?: number;
-		iDeferLoading?: any;
-		iDisplayLength?: number;
-		iDisplayStart?: number;
-		iScrollLoadGap?: number;
-		iTabIndex?: number;
-		oLanguage?: LanguageOptions;
-		oSearch?: any;
-		sAjaxDataProp?: string;
-		sAjaxSource?: string;
-		sCookiePrefix?: string;
-		sDom?: string;
-		sPaginationType?: string;
-		sScrollX?: string;
-		sScrollXInner?: string;
-		sScrollY?: string;
-		sServerMethod? : string;
+		//#region Callbacks
+		createdRow?: ( row: HTMLElement, data: any, dataIndex: number ) => void;
+		drawCallback?: ( settings: Settings ) => void;
+		footerCallback?: ( tfoot: HTMLElement, data: any[], start: number, end: number, display: any[] ) => void;
+		formatNumber?: ( toFormat: number ) => string;
+		headerCallback?: ( tfoot: HTMLElement, data: any[], start: number, end: number, display: any[] ) => void;
+		infoCallback?: ( settings: Settings, start: number, end: number, max: number, total: number, pre: string ) => string;
+		initComplete?: ( settings: Settings, json: any ) => void;
+		preDrawCallback?: ( settings: Settings ) => void;
+		rowCallback?: ( row: HTMLElement, data: any ) => void;
+		stateLoadCallback?: ( settings: Settings ) => State;
+		stateLoaded?: ( settings: Settings, data: State ) => void;
+		stateLoadParams?: ( settings: Settings, data: State ) => void;
+		stateSaveCallback?: ( settings: Settings, data: State ) => void;
+		stateSaveParams?: ( settings: Settings, data: State ) => void;
+		//#endregion
+
+		//#region Options
+		deferLoading?: any;
+		destroy?: boolean;
+		displayStart?: number;
+		dom?: string;
+		lengthMenu?: any[];
+		orderCellsTop?: boolean;
+		orderClasses?: boolean;
+		order?: any[];
+		orderFixed?: any;
+		orderMulti?: boolean;
+		pageLength?: number;
+		pagingType?: string;
+		renderer?: any;
+		retrieve?: boolean;
+		scrollCollapse?: boolean;
+		searchCols?: ColumnSearch[];
+		searchDelay?: number;
+		search?: Search;
+		stateDuration?: number;
+		stripeClasses?: string[];
+		tabIndex?: number;
+		//#endregion
+
+		//#region Columns
+		columns?: Column[];
+		columnDefs?: ColumnDef[];
+		//#endregion
+
+		//#region Internationalisation
+		language?: Language;
+		//#endregion
 	}
 
-	export interface LanguageOptions
-	{
-		oAria? : AriaOptions;
-		oPaginate? : PaginateOptions;
-		sEmptyTable?: string;
-		sInfo?: string;
-		sInfoEmpty?: string;
-		sInfoFiltered?: string;
-		sInfoPostFix?: string;
-		sInfoThousands?: string;
-		sLengthMenu?: string;
-		sLoadingRecords?: string;
-		sProcessing?: string;
-		sSearch?: string;
-		sUrl?: string;
-		sZeroRecords?: string;
+	export interface CellIndex {
+		row: number;
+		column: number;
+		columnVisible?: boolean;
 	}
 
-	export interface AriaOptions
-	{
-		sSortAscending?: string;
-		sSortDescending?: string;
+	export interface Column {
+		cellType?: string;
+		className?: string;
+		contentPadding?: string;
+		createdCell?: ( cell: HTMLElement, cellData: any, rowData: any, rowIndex: number, colIndex: number ) => void;
+		data?: any;
+		defaultContent?: string;
+		name?: string;
+		orderable?: boolean;
+		orderData?: any;
+		orderDataType?: string;
+		orderSequence?: string[];
+		render?: any;
+		searchable?: boolean;
+		title?: string;
+		type?: string;
+		visible?: boolean;
+		width?: string;
 	}
 
-	export interface PaginateOptions
-	{
-		sFirst?: string;
-		sLast?: string;
-		sNext?: string;
-		sPrevious?: string;
+	export interface ColumnDef extends Column {
+		targets?: any;
 	}
 
-	export interface ColumnOptions
-	{
-		aDataSort?: number[];
-		asSorting?: string[];
-		bSearchable? : boolean;
-		bSortable? : boolean;
-		bVisible? : boolean;
-		_bAutoType? : boolean;
-		fnCreatedCell?: CreatedCell;
-		iDataSort?: number;
-		mData?: any;
-		mRender?: any;
-		sCellType?: string;
-		sClass?: string;
-		sContentPadding?: string;
-		sDefaultContent?: string;
-		sName?: string;
-		sSortDataType?: string;
-		sSortingClass?: string;
-		sTitle?: string;
-		sType?: string;
-		sWidth?: string;
+	export interface ColumnSearch {
+		search: string;
+		escapeRegEx?: boolean;
 	}
 
-	export interface ColumnDef extends ColumnOptions
-	{
-		aTargets: any[];
+	export interface ColumnState {
+		visible: boolean;
+		search?: Search;
 	}
 
-	export interface Settings
-	{
-		oFeatures : Features;
-		oScroll: ScrollingSettings;
-		oLanguage : { fnInfoCallback : InfoCallback; };
-		oBrowser : { bScrollOversize : boolean; };
-		aanFeatures: Node[][];
-		aoData: Row[];
-		aiDisplay: number[];
-		aiDisplayMaster: number[];
-		aoColumns: Column[];
-		aoHeader: any[];
-		aoFooter: any[];
-		asDataSearch: string[];
-		oPreviousSearch: any;
-		aoPreSearchCols: any[];
-		aaSorting: any[][];
-		aaSortingFixed: any[][];
-		asStripeClasses: string[];
-		asDestroyStripes: string[];
-		sDestroyWidth: number;
-		aoRowCallback: RowCallback[];
-		aoHeaderCallback: HeaderCallback[];
-		aoFooterCallback: FooterCallback[];
-		aoDrawCallback: DrawCallback[];
-		aoRowCreatedCallback: RowCreatedCallback[];
-		aoPreDrawCallback: PreDrawCallback[];
-		aoInitComplete: InitComplete[];
-		aoStateSaveParams: StateSaveParams[];
-		aoStateLoadParams: StateLoadParams[];
-		aoStateLoaded: StateLoaded[];
-		sTableId: string;
-		nTable: Node;
-		nTHead: Node;
-		nTFoot: Node;
-		nTBody: Node;
-		nTableWrapper: Node;
-		bDeferLoading: boolean;
-		bInitialized: boolean;
-		aoOpenRows: any[];
-		sDom: string;
-		sPaginationType: string;
-		iCookieDuration: number;
-		sCookiePrefix: string;
-		fnCookieCallback: CookieCallback;
-		aoStateSave: StateSaveCallback[];
-		aoStateLoad: StateLoadCallback[];
-		oLoadedState: any;
-		sAjaxSource: string;
-		sAjaxDataProp: string;
-		bAjaxDataGet: boolean;
-		jqXHR: any;
-		fnServerData: any;
-		aoServerParams: any[];
-		sServerMethod: string;
-		fnFormatNumber: FormatNumber;
-		aLengthMenu: any[];
-		iDraw: number;
-		bDrawing: boolean;
-		iDrawError: number;
-		_iDisplayLength: number;
-		_iDisplayStart: number;
-		_iDisplayEnd: number;
-		_iRecordsTotal: number;
-		_iRecordsDisplay: number;
-		bJUI: boolean;
-		oClasses: any;
-		bFiltered: boolean;
-		bSorted: boolean;
-		bSortCellsTop: boolean;
-		oInit: any;
-		aoDestroyCallback: any[];
-		fnRecordsTotal: () => number;
-		fnRecordsDisplay: () => number;
-		fnDisplayEnd: () => number;
-		oInstance : any;
-		sInstance: string;
-		iTabIndex: number;
-		nScrollHead: Node;
-		nScrollFoot: Node;
+	export interface ColumnSort {
+		columnIndex: number;
+		direction: string;
 	}
 
-	export interface Features
-	{
-		bAutoWidth: boolean;
-		bDeferRender: boolean;
-		bFilter: boolean;
-		bInfo: boolean;
-		bLengthChange: boolean;
-		bPaginate: boolean;
-		bProcessing: boolean;
-		bServerSide: boolean;
-		bSort: boolean;
-		bSortClasses: boolean;
-		bStateSave: boolean;
+	export interface Language {
+		aria?: LanguageAria;
+		decimal?: string;
+		emptyTable?: string;
+		info?: string;
+		infoEmpty?: string;
+		infoFiltered?: string;
+		infoPostFix?: string;
+		lengthMenu?: string;
+		loadingRecords?: string;
+		paginate?: LanguagePaginate;
+		processing?: string;
+		search?: string;
+		searchPlaceholder?: string;
+		thousands?: string;
+		url?: string;
+		zeroRecrods?: string;
 	}
 
-	export interface ScrollingSettings
-	{
-		bAutoCss : boolean;
-		bCollapse: boolean;
-		bInfinite: boolean;
-		iBarWidth: number;
-		iLoadGap: number;
-		sX: string;
-		sY: string;
+	export interface LanguageAria {
+		sortAscending?: string;
+		sortDescending?: string;
 	}
 
-	export interface Row
-	{
-		nTr: Node;
-		_aData: any;
-		_aSortData: any[];
-		_anHidden: Node[];
-		_sRowStripe: string;
+	export interface LanguagePaginate {
+		first?: string;
+		last?: string;
+		next?: string;
+		previous?: string;
 	}
 
-	export interface Column
-	{
-		aDataSort: any;
-		asSorting: string[];
-		bSearchable : boolean;
-		bSortable : boolean;
-		bVisible : boolean;
-		_bAutoType : boolean;
-		fnCreatedCell: CreatedCell;
-		fnGetData: (data: any, specific: string) => any;
-		fnSetData: (data: any, value: any) => void;
-		mData: any;
-		mRender: any;
-		nTh: Node;
-		nIf: Node;
-		sClass: string;
-		sContentPadding: string;
-		sDefaultContent: string;
-		sName: string;
-		sSortDataType: string;
-		sSortingClass: string;
-		sSortingClassJUI: string;
-		sTitle: string;
-		sType: string;
-		sWidth: string;
-		sWidthOrig: string;
+	export interface Search {
+		search?: string;
+		regex?: boolean;
+		smart?: boolean;
+		caseInsensitive?: boolean;
 	}
 
-	export interface CookieCallback
-	{
-		(name: string, data: any, expires: string, path: string, cookie: string) : void;
+	export interface SelectorModifier {
+		order: string;
+		search: string;
+		page: string;
 	}
 
-	export interface RowCreatedCallback
-	{
-		(row: Node, data: any[], dataIndex: number) : void;
+	export interface Settings {
 	}
 
-	export interface DrawCallback
-	{
-		(settings: Settings) : void;
+	export interface State {
+		time: number;
+		start: number;
+		length: number;
+		order: any[];
+		search: Search;
+		columns: ColumnState[];
 	}
 
-	export interface FooterCallback
-	{
-		(foot: Element, data: any[], start:number, end:number, display: number[]) : void;
+	// Can't use these until TypeScript 1.4
+	//type CellSelector = string | Node | ():void | CellIndex | Array<string | Node | ():void | CellIndex>;
+	//type ColumnData = number | string | { "_": string, filter?: string, display?: string, sort?: string } | ( row: any, type: string, set: string, meta: { row: number, col: number: settings: Settings } ) : any;
+	//type ColumnSelector = number | string | Node | ():void | JQuery | Array<number | string | Node | ():void | JQuery>;
+	//type Order = [number, string] | Array<[number, string]>;
+	//type RowChildData = string | Node | JQuery | Array<string | Node | JQuery>;
+	//type RowSelector = number | string | Node | ():void | JQuery | Array<number | string | Node | ():void | JQuery>;
+	//type TableSelector = number | string | Node | JQuery | Array<number | string | Node | JQuery>;
+	//#endregion
+
+	//#region Api
+	export interface AjaxApi {
+		json(): any;
+		params(): any;
+		reload( callback?: ( json: any ) => void, resetPaging?: boolean ): Api;
+		url: AjaxUrlApi;
 	}
 
-	export interface FormatNumber
-	{
-		(toFormat: number) : string;
+	export interface AjaxUrlApi {
+		(): string;
+		( url: string ): Api;
+		load( callback?: ( json: any ) => void, resetPaging?: boolean ): Api;
 	}
 
-	export interface HeaderCallback
-	{
-		(head: Element, data: any[], start:number, end:number, display: number[]) : void;
+	export interface Api {
+		//#region Core
+		$( selector: string, modifier?: SelectorModifier ): JQuery;
+		$( selector: HTMLElement[], modifier?: SelectorModifier ): JQuery;
+		$( selector: JQuery, modifier?: SelectorModifier ): JQuery;
+		ajax: AjaxApi;
+		clear(): Api;
+		data(): Api;
+		destroy( remove?: boolean ): Api;
+		draw( reset?: boolean ): Api;
+		off( event: string, callback?: ( e: string, settings: Settings, json: any ) => void ): Api;
+		on( event: string, callback: ( e: string, settings: Settings, json: any ) => void ): Api;
+		one( event: string, callback: ( e: string, settings: Settings, json: any ) => void ): Api;
+		order: OrderApi;
+		page: PageApi;
+		search(): string;
+		search( input: string, regex?: boolean, smart?: boolean, caseInsen?: boolean ): Api;
+		settings(): Settings;
+		state: StateApi;
+		//#endregion
+
+		//#region Cell
+		cell: CellApi;
+		cells: CellsApi;
+		//#endregion
+
+		//#region Columns
+		column: ColumnApi;
+		columns: ColumnsApi;
+		//#endregion
+
+		//#region Rows
+		row: RowApi;
+		rows: RowsApi;
+		//#endregion
+
+		//#region Tables
+		table: TableApi;
+		tables: TablesApi;
+		//#endregion
+
+		//#region Utility
+		concat( a: Api, b?: Api, ...otherDataTableApis: Api[] ): Api;
+		each( fn: ( value: any, index: number, api: Api ) => void ): Api;
+		eq( idx: number ): Api;
+		filter( fn: ( value: any, index: number, api: Api ) => boolean ): Api;
+		flatten(): Api;
+		indexOf( value: any ): number;
+		iterator( flatten: boolean, type: string, fn: ( settings: Settings ) => Api, returns?: boolean );
+		iterator( flatten: boolean, type: string, fn: ( settings: Settings, item: any, loopCounter: number ) => Api, returns?: boolean );
+		iterator( flatten: boolean, type: string, fn: ( settings: Settings, index: number, outerCounter: number, innerCounter: number ) => Api, returns?: boolean );
+		iterator( flatten: boolean, type: string, fn: ( settings: Settings, columnIdx: number, tableCounter: number, columnCounter: number, rowIndexes: number[] ) => Api, returns?: boolean );
+		iterator( flatten: boolean, type: string, fn: ( settings: Settings, rowIdx: number, columnIdx: number, tableCounter: number, cellCounter: number ) => Api, returns?: boolean );
+		join( seperator: string ): string;
+		lastIndexOf( value: any ): number;
+		length: number;
+		map( fn: ( value: any, index: number, api: Api ) => any ): Api;
+		pluck( property: string ): Api;
+		pluck( property: number ): Api;
+		pop(): any;
+		push( value_1: any, value_2?: any, ...otherValues: any[] ): number;
+		reduce( fn: ( accumulatedValue: any, itemValue: any, index: number, api: Api ) => any, initialValue?: any ): any;
+		reduceRight( fn: ( accumulatedValue: any, itemValue: any, index: number, api: Api ) => any, initialValue?: any ): any;
+		reverse(): Api;
+		shift(): any;
+		sort( fn?: ( value_1: any, value_2: any ) => number ): Api;
+		splice( index: number, howMany: number, value_1: any, ...otherValues: any[] ): any[];
+		to$(): JQuery;
+		toArray(): any[];
+		toJQuery(): JQuery;
+		unique(): Api;
+		unshift( value_1: any, value_2?: any, ...otherValues: any[] ): number;
+		//#endregion
 	}
 
-	export interface InfoCallback
-	{
-		(settings: Settings, start: number, end: number, max:number, total: number, pre: string) : string;
+	export interface CellApi {
+		( cellSelector: any, modifier?: SelectorModifier ): Api;
+		( rowSelector: any, columnSelector: any, modifier?: SelectorModifier ): Api;
+		cache( type: string ): Api;
+		data(): any;
+		data( set: any ): Api;
+		index(): CellIndex;
+		invalidate( source?: string ): Api;
+		node(): HTMLElement;
+		render( type: string ): Api;
 	}
 
-	export interface InitComplete
-	{
-		(settings: Settings, json: any) : void;
+	export interface CellsApi {
+		( modifier?: SelectorModifier ): Api;
+		( cellSelector: any, modifier?: SelectorModifier ): Api;
+		( rowSelector: any, columnSelector: any, modifier?: SelectorModifier ): Api;
+		cache( type: string ): Api;
+		data(): Api;
+		indexex(): Api;
+		invalidate( source?: string ): Api;
+		nodes(): Api;
+		render( type: string ): Api;
 	}
 
-	export interface PreDrawCallback
-	{
-		(settings: Settings) : boolean;
+	export interface ColumnApi {
+		( columnSelector: any, modifier?: SelectorModifier ): Api;
+		cache( type: string ): Api;
+		data(): Api;
+		dataSrc(): any;
+		footer(): HTMLElement;
+		header(): HTMLElement;
+		index( type?: string ): Api;
+		index( type: string, index: number ): number;
+		nodes(): Api;
+		order( direction: string ): Api;
+		search(): string;
+		search( input: string, regex?: boolean, smart?: boolean, caseInsen?: boolean ): Api;
+		visible( show: boolean, redrawCalculation?: boolean ): Api;
 	}
 
-	export interface RowCallback
-	{
-		(row : Settings, data: any[], displayIndex: number, displayIndexFull: number) : void;
+	export interface ColumnsApi {
+		( modifier?: SelectorModifier ): Api;
+		( columnSelector: any, modifier?: SelectorModifier ): Api;
+		cache( type: string ): Api;
+		data(): Api;
+		dataSrc(): Api;
+		footer(): Api;
+		header(): Api;
+		indexes( type?: string ): Api;
+		nodes(): Api;
+		order( direction: string ): Api;
+		search(): Api;
+		search( input: string, regex?: boolean, smart?: boolean, caseInsen?: boolean ): Api;
+		visible( show: boolean, redrawCalculation?: boolean ): Api;
+		adjust(): Api;
 	}
 
-	export interface StateLoadCallback
-	{
-		(settings: Settings) : any;
+	export interface OrderApi {
+		(): [number, string][];
+		( order: [number, string], ...additionalOrders: [number, string][] ): Api;
+		( order: [number, string][] ): Api;
+		listener: OrderListenerApi;
 	}
 
-	export interface StateLoadParams
-	{
-		(settings: Settings, data: any) : void;
+	export interface OrderListenerApi {
+		( node: HTMLElement, number, callback: () => void ): Api;
+		( node: JQuery, number, callback: () => void ): Api;
+		( node: string, number, callback: () => void ): Api;
 	}
 
-	export interface StateLoaded
-	{
-		(settings: Settings, data: any) : void;
+	export interface PageApi {
+		(): number;
+		( set: string ): Api;
+		( set: number ): Api;
+		info(): PageInfo;
+		len(): number;
+		len( set: number ): Api;
 	}
 
-	export interface StateSaveCallback
-	{
-		(settings: any, data:any) : void;
+	export interface PageInfo {
+		page: number;
+		pages: number;
+		start: number;
+		end: number;
+		length: number;
+		recordsTotal: number;
+		recordsDisplay: number;
 	}
 
-	export interface StateSaveParams
-	{
-		(settings: any, data:any) : void;
+	export interface RowApi {
+		( rowSelector: any, modifier?: SelectorModifier ): Api;
+		cache( type: string ): Api;
+		child: RowChildApi;
+		data(): any;
+		data( d: any ): Api;
+		index(): number;
+		invalidate( source?: string ): Api;
+		node(): HTMLElement;
+		remove(): HTMLElement;
+		add( data: any ): Api;
 	}
 
-	export interface CreatedCell
-	{
-		(nTd: Node, cellData: any, rowData: any, row: number, col: number) : void;
+	export interface RowChildApi {
+		(): JQuery;
+		( showRemove: boolean ): Api;
+		( data: any, className: string ): Api;
+		hide(): Api;
+		remove(): Api;
+		show(): Api;
+		isShown(): boolean;
 	}
+
+	export interface RowsApi {
+		( modifier?: SelectorModifier ): Api;
+		( rowSelector: any, modifier?: SelectorModifier ): Api;
+		cache( type: string ): Api;
+		data(): Api;
+		indexes(): Api;
+		invalidate( source?: string ): Api;
+		nodes(): Api;
+		remove(): Api;
+		add( data: any[] ): Api;
+	}
+
+	export interface StateApi {
+		(): State;
+		clear(): Api;
+		loaded(): State;
+		save(): Api;
+	}
+
+	export interface TableApi {
+		( tableSelector: any ): Api;
+		body(): HTMLElement;
+		container(): HTMLElement;
+		footer(): HTMLElement;
+		header(): HTMLElement;
+		node(): HTMLElement;
+	}
+
+	export interface TablesApi {
+		( tableSelector: any ): Api;
+		body(): Api;
+		containers(): Api;
+		footer(): Api;
+		header(): Api;
+		nodes(): Api;
+	}
+
+	export interface StaticApi {
+		( options?: DataTables.Options ): JQuery;
+		isDataTable(): boolean;
+		tables( visible?: boolean ): Api[];
+		util: {
+			escapeRegEx( str: string ): string;
+			throttle( fn: ( ...params: any[] ) => void, freq?: number ): ( ...params: any[] ) => void;
+		};
+		versionCheck( version: string ): boolean;
+	}
+	//#endregion
 }
