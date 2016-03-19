@@ -241,6 +241,8 @@ declare namespace JQueryValidation
         focusInvalid(): void;
         errorMap: ErrorDictionary;
         errorList: ErrorListItem[];
+        
+        unobtrusive: any;
     }
 }
 
